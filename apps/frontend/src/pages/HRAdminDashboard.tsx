@@ -16,7 +16,11 @@ export default function HRAdminDashboard() {
 
   return (
     <div className="min-h-screen bg-slate-900 text-white">
-      <AppHeader title="Dexa - HR Admin Dashboard" />
+      <AppHeader 
+        title="Dexa - HR Admin Dashboard" 
+        showUserInfo={true}
+        showAdminLink={true}
+      />
 
       <div className="flex">
         <aside className="w-56 border-r border-slate-700 p-4">
