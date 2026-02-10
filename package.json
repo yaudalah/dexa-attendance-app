@@ -1,0 +1,26 @@
+{
+  "name": "dexa",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "db:init": "./scripts/run-sql.sh",
+    "setup": "./scripts/setup.sh",
+    "run": "./scripts/run.sh",
+    "api:build": "npm run build -w @dexa/api",
+    "api:start": "npm run start -w @dexa/api",
+    "api:dev": "npm run start:dev -w @dexa/api",
+    "audit:build": "npm run build -w @dexa/audit",
+    "audit:start": "npm run start -w @dexa/audit",
+    "audit:dev": "npm run start:dev -w @dexa/audit",
+    "frontend:dev": "npm run dev -w @dexa/frontend",
+    "frontend:build": "npm run build -w @dexa/frontend"
+  },
+  "dependencies": {
+    "pg": "^8.18.0"
+  }
+}
