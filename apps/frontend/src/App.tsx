@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import EmployeeDashboard from './pages/EmployeeDashboard';
 import HRAdminDashboard from './pages/HRAdminDashboard';
 import ToastContainer from './components/ToastContainer';
+import NotFoundPage from './pages/NotFoundPage';
 
 function ProtectedRoute({
   children,
@@ -13,9 +14,15 @@ function ProtectedRoute({
   adminOnly?: boolean;
 }) {
   const { isAuthenticated, user } = useAppSelector((s) => s.auth);
-  if (!isAuthenticated) return <Navigate to="/login" replace />;
-  if (adminOnly && user?.position !== 'admin')
-    return <Navigate to="/dashboard" replace />;
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (adminOnly && user?.position !== 'admin') {
+    return <NotFoundPage />;
+  }
+
   return <>{children}</>;
 }
 
@@ -41,7 +48,7 @@ export default function App() {
           }
         />
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
       <ToastContainer />
     </>
