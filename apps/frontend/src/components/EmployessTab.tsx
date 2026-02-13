@@ -13,6 +13,10 @@ export default function EmployeesTab() {
     const [loading, setLoading] = useState(false);
     const [modalOpen, setModalOpen] = useState(false);
     const [editing, setEditing] = useState<Employee | null>(null);
+    const [page, setPage] = useState(1);
+    const [limit] = useState(2);
+    const [totalPages, setTotalPages] = useState(1);
+    const [total, setTotal] = useState(0);
 
     useSocket((payload: any) => {
         dispatch(
@@ -28,18 +32,23 @@ export default function EmployeesTab() {
     const loadEmployees = useCallback(async () => {
         setLoading(true);
         try {
-            const res = await employeeApi.getAll({ page: 1, limit: 100 });
-            setEmployees(res.data.data || []);
+            const res = await employeeApi.getAll({ page, limit });
+
+            const response = res.data;
+
+            setEmployees(response.data || []);
+            setTotalPages(response.meta.totalPages);
+            setTotal(response.meta.total);
         } catch {
             dispatch(addToast({ message: 'Failed to load employees', type: 'error' }));
         } finally {
             setLoading(false);
         }
-    }, [dispatch]);
+    }, [dispatch, page, limit]);
 
     useEffect(() => {
         loadEmployees();
-    }, []);
+    }, [loadEmployees]);
 
     const handleDelete = async (id: string) => {
         if (!confirm('Delete this employee?')) return;
@@ -112,6 +121,50 @@ export default function EmployeesTab() {
                             ))}
                         </tbody>
                     </table>
+                    <div className="flex justify-between items-center mt-4 mx-2 mb-2">
+                        <span className="text-slate-400 text-sm">
+                            Showing {(page - 1) * limit + 1} -{' '}
+                            {Math.min(page * limit, total)} of {total} employees
+                        </span>
+
+                        <div className="flex gap-1">
+                            <button
+                                disabled={page === 1}
+                                onClick={() => setPage(1)}
+                                className="px-3 py-1 rounded bg-slate-700 disabled:opacity-40"
+                            >
+                                First
+                            </button>
+
+                            <button
+                                disabled={page === 1}
+                                onClick={() => setPage((p) => p - 1)}
+                                className="px-3 py-1 rounded bg-slate-700 disabled:opacity-40"
+                            >
+                                Prev
+                            </button>
+
+                            <span className="px-3 py-1 text-sm text-slate-400">
+                                {page} / {totalPages}
+                            </span>
+
+                            <button
+                                disabled={page === totalPages}
+                                onClick={() => setPage((p) => p + 1)}
+                                className="px-3 py-1 rounded bg-slate-700 disabled:opacity-40"
+                            >
+                                Next
+                            </button>
+
+                            <button
+                                disabled={page === totalPages}
+                                onClick={() => setPage(totalPages)}
+                                className="px-3 py-1 rounded bg-slate-700 disabled:opacity-40"
+                            >
+                                Last
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
 

@@ -65,7 +65,7 @@ export class EmployeeController {
     if (!isAdmin && req.user.id !== id) {
       throw new ForbiddenException('Forbidden');
     }
-    return this.employeeService.update(id, dto);
+    return this.employeeService.update(id, dto, isAdmin);
   }
 
   @Delete(':id')

@@ -5,6 +5,7 @@ import {
   BadRequestException,
   Inject,
   Logger,
+  ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -127,8 +128,12 @@ export class EmployeeService {
     return this.employeeRepo.findOne({ where: { email } });
   }
 
-  async update(id: string, dto: UpdateEmployeeDto) {
+  async update(id: string, dto: UpdateEmployeeDto, isAdmin: boolean) {
     this.logger.log(`Updating employee: ${id} | payload: ${JSON.stringify({ ...dto, password: dto.password ? '[REDACTED]' : undefined })}`);
+
+    if (!isAdmin && dto.email) {
+      throw new ForbiddenException('Forbidden: Staff cannot update email');
+    }
 
     const employee = await this.employeeRepo.findOne({ where: { id } });
     if (!employee) {
@@ -158,7 +163,6 @@ export class EmployeeService {
       payload: this.toResponse(saved),
       timestamp: new Date(),
     });
-
     this.logger.log(`Emitting profile-updated WebSocket event for: ${saved.email}`);
     this.employeeGateway.emitProfileUpdated(saved);
     this.logger.log(`Invalidating Redis cache for employee: ${id}`);

@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { X } from 'lucide-react';
 import { employeeApi, Employee } from '../api/employee';
-import { useAppDispatch } from '../store/hooks';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { addToast } from '../store/slices/uiSlice';
 import { User, Upload } from 'lucide-react';
 import { useState } from 'react';
@@ -31,6 +31,7 @@ export default function EmployeeModal({
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const { user } = useAppSelector((s) => s.auth);
 
   const dispatch = useAppDispatch();
   const {
@@ -102,7 +103,7 @@ export default function EmployeeModal({
       if (editing) {
         const payload: Partial<FormData> = {
           name: data.name,
-          email: data.email,
+          email: user?.position === 'staff' ? undefined : data.email,
           position: data.position,
           phone: data.phone || undefined,
         };
@@ -211,7 +212,7 @@ export default function EmployeeModal({
                 },
               })}
               type="email"
-              disabled={!!editing}
+              disabled={editing  && user?.position === 'staff' ? true : false}
               className="w-full px-3 py-2 rounded-lg bg-slate-700 border border-slate-600 text-white disabled:opacity-60"
             />
             {errors.email && (

@@ -80,7 +80,7 @@ fi
 echo ""
 echo "=== Setup complete ==="
 echo ""
-echo "Run the app: ./scripts/run.sh"
+echo "Run the app: ./scripts/run.sh or npm run run"
 echo "Or manually:"
 echo "  npm run api:dev     # Terminal 1"
 echo "  npm run audit:dev   # Terminal 2"
