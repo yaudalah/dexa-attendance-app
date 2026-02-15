@@ -6,7 +6,7 @@ import {
   Calendar, Upload,
   Pencil
 } from 'lucide-react';
-import { format, subDays } from 'date-fns';
+import { format, startOfMonth } from 'date-fns';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import {
   fetchHistory,
@@ -25,9 +25,12 @@ export default function EmployeeDashboard() {
   const [user, setUser] = useState<Employee>({} as Employee);
   const { history, loading, error } = useAppSelector((s) => s.attendance);
   const [startDate, setStartDate] = useState(
-    format(subDays(new Date(), 7), 'yyyy-MM-dd')
+    format(startOfMonth(new Date()), 'yyyy-MM-dd')
   );
-  const [endDate, setEndDate] = useState(format(new Date(), 'yyyy-MM-dd'));
+
+  const [endDate, setEndDate] = useState(
+    format(new Date(), 'yyyy-MM-dd')
+  );
   const [uploading, setUploading] = useState(false);
 
   const loadMyData = async (): Promise<{ user: Employee; }> => {
@@ -84,10 +87,10 @@ export default function EmployeeDashboard() {
   return (
     <div className="min-h-screen bg-slate-900 text-white">
       <AppHeader
-      title="Dexa - Employee"
-      showUserInfo={true}
-      showAdminLink={true}
-    />
+        title="Dexa - Employee"
+        showUserInfo={true}
+        showAdminLink={true}
+      />
 
       <main className="p-6 max-w-4xl mx-auto space-y-6">
         {/* Profile Card */}
@@ -214,8 +217,8 @@ export default function EmployeeDashboard() {
                       <td className="px-4 py-3">
                         <span
                           className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-sm ${r.type === 'in'
-                              ? 'bg-emerald-900/50 text-emerald-300'
-                              : 'bg-amber-900/50 text-amber-300'
+                            ? 'bg-emerald-900/50 text-emerald-300'
+                            : 'bg-amber-900/50 text-amber-300'
                             }`}
                         >
                           {r.type === 'in' ? (

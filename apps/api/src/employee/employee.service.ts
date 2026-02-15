@@ -135,6 +135,10 @@ export class EmployeeService {
       throw new ForbiddenException('Forbidden: Staff cannot update email');
     }
 
+    if (!isAdmin && dto.position) {
+      throw new ForbiddenException('Forbidden: Staff cannot update position');
+    }
+
     const employee = await this.employeeRepo.findOne({ where: { id } });
     if (!employee) {
       this.logger.warn(`Update failed: Employee not found - ${id}`);

@@ -20,7 +20,7 @@ export default function Login() {
     handleSubmit,
     formState: { errors },
   } = useForm<LoginForm>();
-1
+
   useEffect(() => {
     dispatch(clearError());
   }, [dispatch]);
@@ -28,9 +28,9 @@ export default function Login() {
   useEffect(() => {
     if (isAuthenticated && user) {
       if (user.position === 'admin') {
-        navigate('/admin');
+        navigate('/admin', { replace: true });
       } else {
-        navigate('/dashboard');
+        navigate('/dashboard', { replace: true });
       }
     }
   }, [isAuthenticated, user, navigate]);

@@ -14,6 +14,7 @@ interface AttendanceState {
   history: AttendanceRecord[];
   monitoring: AttendanceRecord[];
   meta: { total: number; page: number; limit: number; totalPages: number } | null;
+  metaMonitoring: { total: number; page: number; limit: number; totalPages: number } | null;
   loading: boolean;
   error: string | null;
 }
@@ -22,6 +23,7 @@ const initialState: AttendanceState = {
   history: [],
   monitoring: [],
   meta: null,
+  metaMonitoring: null,
   loading: false,
   error: null,
 };
@@ -111,6 +113,7 @@ const attendanceSlice = createSlice({
       .addCase(fetchMonitoring.fulfilled, (state, action) => {
         state.loading = false;
         state.monitoring = action.payload.data;
+        state.metaMonitoring = action.payload.meta;
         state.error = null;
       })
       .addCase(fetchMonitoring.rejected, (state, action) => {

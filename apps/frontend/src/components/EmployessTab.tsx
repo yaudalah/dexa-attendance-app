@@ -6,8 +6,8 @@ import { useAppDispatch } from '../store/hooks';
 import { addToast } from '../store/slices/uiSlice';
 import EmployeeModal from './EmployeeModal';
 import { useSocket } from '../hooks/useSocket';
+import Pagination from './layout/Pagination';
 
-const PAGE_LIMIT = [10, 20, 50, 100];
 export default function EmployeesTab() {
     const dispatch = useAppDispatch();
     const [employees, setEmployees] = useState<Employee[]>([]);
@@ -60,11 +60,6 @@ export default function EmployeesTab() {
         } catch {
             dispatch(addToast({ message: 'Delete failed', type: 'error' }));
         }
-    };
-
-    const handleLimitChange = (value: number) => {
-        setPage(1);
-        setLimit(value);
     };
 
     return (
@@ -128,66 +123,17 @@ export default function EmployeesTab() {
                         </tbody>
                     </table>
                     {/* Pagination Controls */}
-                    <div className="flex justify-between items-center mt-4 mx-2 mb-2">
-                        <div className="flex items-center gap-3">
-                            <span className="text-slate-400 text-sm">
-                                Showing {(page - 1) * limit + 1} -{' '}
-                                {Math.min(page * limit, total)} of {total}
-                            </span>
-
-                            <div className="flex items-center gap-2 text-sm text-slate-400">
-                                <select
-                                    value={limit}
-                                    onChange={(e) => handleLimitChange(Number(e.target.value))}
-                                    className="bg-slate-700 text-white rounded px-2 py-1 outline-none"
-                                >
-                                    {PAGE_LIMIT.map((size) => (
-                                        <option key={size} value={size}>
-                                            {size}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
-
-                        <div className="flex gap-1">
-                            <button
-                                disabled={page === 1}
-                                onClick={() => setPage(1)}
-                                className="px-3 py-1 rounded bg-slate-700 disabled:opacity-40"
-                            >
-                                First
-                            </button>
-
-                            <button
-                                disabled={page === 1}
-                                onClick={() => setPage((p) => p - 1)}
-                                className="px-3 py-1 rounded bg-slate-700 disabled:opacity-40"
-                            >
-                                Prev
-                            </button>
-
-                            <span className="px-3 py-1 text-sm text-slate-400">
-                                {page} / {totalPages}
-                            </span>
-
-                            <button
-                                disabled={page === totalPages}
-                                onClick={() => setPage((p) => p + 1)}
-                                className="px-3 py-1 rounded bg-slate-700 disabled:opacity-40"
-                            >
-                                Next
-                            </button>
-
-                            <button
-                                disabled={page === totalPages}
-                                onClick={() => setPage(totalPages)}
-                                className="px-3 py-1 rounded bg-slate-700 disabled:opacity-40"
-                            >
-                                Last
-                            </button>
-                        </div>
-                    </div>
+                    <Pagination
+                        page={page}
+                        totalPages={totalPages}
+                        totalItems={total}
+                        limit={limit}
+                        onPageChange={setPage}
+                        onLimitChange={(newLimit) => {
+                            setPage(1);
+                            setLimit(newLimit);
+                        }}
+                    />
                 </div>
             )}
 

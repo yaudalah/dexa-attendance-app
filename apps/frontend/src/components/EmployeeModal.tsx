@@ -155,7 +155,7 @@ export default function EmployeeModal({
           </h3>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-slate-700 text-slate-400"
+            className="p-2 rounded-lg hover:bg-slate-700 text-slate-400 hover:text-red-400 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -244,6 +244,7 @@ export default function EmployeeModal({
             <select
               {...register('position')}
               className="w-full px-3 py-2 rounded-lg bg-slate-700 border border-slate-600 text-white"
+              disabled={editing && user?.position === 'staff' ? true : false}
             >
               <option value="staff">Staff</option>
               <option value="admin">Admin</option>
@@ -260,7 +261,7 @@ export default function EmployeeModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-2 rounded-lg border border-slate-600 text-slate-400 hover:bg-slate-700"
+              className="flex-1 py-2 rounded-lg border border-slate-600 text-slate-400 hover:bg-red-500 hover:text-black transition-colors"
             >
               Cancel
             </button>

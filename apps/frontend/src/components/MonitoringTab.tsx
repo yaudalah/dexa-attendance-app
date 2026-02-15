@@ -1,16 +1,22 @@
 // src/components/MonitoringTab.tsx
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { fetchMonitoring } from '../store/slices/attendanceSlice';
+import Pagination from './layout/Pagination';
 
 export default function MonitoringTab() {
     const dispatch = useAppDispatch();
-    const { monitoring, loading } = useAppSelector((s) => s.attendance);
+    const { monitoring, loading, metaMonitoring } = useAppSelector((s) => s.attendance);
+    const [page, setPage] = useState(1);
+    const [limit, setLimit] = useState(10);
+    const totalPages = metaMonitoring?.totalPages || 1;
+    const total = metaMonitoring?.total || 0;
 
     useEffect(() => {
-        dispatch(fetchMonitoring({ page: 1, limit: 50 }));
-    }, [dispatch]);
+        dispatch(fetchMonitoring({ page: page, limit: limit }));
+
+    }, [dispatch, page, limit]);
 
     if (loading) return <p className="text-slate-500">Loading...</p>;
 
@@ -52,6 +58,18 @@ export default function MonitoringTab() {
                         )}
                     </tbody>
                 </table>
+                {/* Pagination Controls */}
+                <Pagination
+                    page={page}
+                    totalPages={totalPages}
+                    totalItems={total}
+                    limit={limit}
+                    onPageChange={setPage}
+                    onLimitChange={(newLimit) => {
+                        setPage(1);
+                        setLimit(newLimit);
+                    }}
+                />
             </div>
         </div>
     );
