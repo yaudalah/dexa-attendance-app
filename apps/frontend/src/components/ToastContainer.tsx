@@ -12,7 +12,9 @@ export default function ToastContainer() {
       {toasts.map((t) => (
         <Toast
           key={t.id}
-          {...t}
+          message={t.message}
+          type={t.type}
+          title={t.title}
           onClose={() => dispatch(removeToast(t.id))}
         />
       ))}
@@ -21,13 +23,11 @@ export default function ToastContainer() {
 }
 
 function Toast({
-  id,
   message,
   type,
   title,
   onClose,
 }: {
-  id: string;
   message: string;
   type: 'success' | 'error' | 'info';
   title?: string;

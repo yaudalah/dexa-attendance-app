@@ -73,6 +73,7 @@ export default function EmployeeModal({
       dispatch(
         addToast({
           message: 'Photo must not exceed 5MB',
+          title: 'Invalid Photo Size',
           type: 'error',
         })
       );

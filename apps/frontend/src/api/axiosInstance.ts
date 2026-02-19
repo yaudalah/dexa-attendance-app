@@ -10,6 +10,7 @@ export const axiosInstance = axios.create({
 });
 
 axiosInstance.interceptors.request.use((config) => {
+  config.headers['x-correlation-id'] = `${crypto.randomUUID().replace(/-/g, '')}`;
   const token = localStorage.getItem('token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -23,7 +24,13 @@ axiosInstance.interceptors.response.use(
     if (err.response?.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      window.location.href = '/login';
+      const isLoginRequest = err.config?.url?.includes('/auth/login');
+      const isOnLoginPage = window.location.pathname === '/login';
+
+      if (!isLoginRequest && !isOnLoginPage) {
+        window.history.pushState({}, '', '/login');
+        window.dispatchEvent(new PopStateEvent('popstate'));
+      }
     }
     return Promise.reject(err);
   }

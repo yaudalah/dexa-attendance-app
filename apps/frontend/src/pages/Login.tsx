@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { Mail, Lock, LogIn } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { login, clearError } from '../store/slices/authSlice';
+import { addToast } from '../store/slices/uiSlice';
 
 interface LoginForm {
   email: string;
@@ -24,6 +25,17 @@ export default function Login() {
   useEffect(() => {
     dispatch(clearError());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (!error) return;
+    dispatch(
+      addToast({
+        type: 'error',
+        title: 'Login failed',
+        message: error,
+      })
+    );
+  }, [error, dispatch]);
 
   useEffect(() => {
     if (isAuthenticated && user) {
@@ -98,12 +110,6 @@ export default function Login() {
                 </p>
               )}
             </div>
-
-            {error && (
-              <div className="p-3 rounded-lg bg-red-900/50 text-red-300 text-sm">
-                {error}
-              </div>
-            )}
 
             <button
               type="submit"
