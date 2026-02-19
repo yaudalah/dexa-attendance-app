@@ -35,11 +35,11 @@ export default function AppHeader({
 
         {showAdminLink && user?.position === 'admin' && (
           <>
-            <NavLink to="/dashboard" end className={navLinkClass}>
+            <NavLink to="/dashboard" className={navLinkClass}>
               Profile
             </NavLink>
 
-            <NavLink to="/admin" className={navLinkClass}>
+            <NavLink to="/admin" end className={navLinkClass}>
               HR Admin
             </NavLink>
           </>

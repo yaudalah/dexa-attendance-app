@@ -38,8 +38,11 @@ export default function EmployeeModal({
     register,
     handleSubmit,
     reset,
+    watch,
     formState: { errors },
   } = useForm<FormData>();
+  const positionValue = watch('position');
+  const isStaffEditingSelf = Boolean(editing && user?.position === 'staff');
 
   useEffect(() => {
     if (editing) {
@@ -241,14 +244,22 @@ export default function EmployeeModal({
           </div>
           <div>
             <label className="block text-sm text-slate-400 mb-1">Position</label>
-            <select
-              {...register('position')}
-              className="w-full px-3 py-2 rounded-lg bg-slate-700 border border-slate-600 text-white"
-              disabled={editing && user?.position === 'staff' ? true : false}
-            >
-              <option value="staff">Staff</option>
-              <option value="admin">Admin</option>
-            </select>
+            {isStaffEditingSelf ? (
+              <>
+                <input type="hidden" {...register('position')} />
+                <p className="w-full px-3 py-2 rounded-lg bg-slate-700 border border-slate-600 text-white/70 capitalize cursor-default">
+                  {positionValue || 'staff'}
+                </p>
+              </>
+            ) : (
+              <select
+                {...register('position')}
+                className="w-full px-3 py-2 rounded-lg bg-slate-700 border border-slate-600 text-white"
+              >
+                <option value="staff">Staff</option>
+                <option value="admin">Admin</option>
+              </select>
+            )}
           </div>
           <div>
             <label className="block text-sm text-slate-400 mb-1">Phone</label>

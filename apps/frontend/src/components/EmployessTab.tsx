@@ -1,6 +1,7 @@
 // src/components/EmployeesTab.tsx
 import { useCallback, useEffect, useState } from 'react';
 import { Plus, Pencil, Trash2, Users } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
 import { employeeApi, Employee } from '../api/employee';
 import { useAppDispatch } from '../store/hooks';
 import { addToast } from '../store/slices/uiSlice';
@@ -8,16 +9,49 @@ import EmployeeModal from './EmployeeModal';
 import { useSocket } from '../hooks/useSocket';
 import Pagination from './layout/Pagination';
 
+const DEFAULT_PAGE = 1;
+const DEFAULT_LIMIT = 10;
+
+function toPositiveInt(value: string | null, fallback: number) {
+    if (!value) return fallback;
+    const parsed = Number(value);
+    return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
+}
+
 export default function EmployeesTab() {
     const dispatch = useAppDispatch();
+    const [searchParams, setSearchParams] = useSearchParams();
     const [employees, setEmployees] = useState<Employee[]>([]);
     const [loading, setLoading] = useState(false);
     const [modalOpen, setModalOpen] = useState(false);
     const [editing, setEditing] = useState<Employee | null>(null);
-    const [page, setPage] = useState(1);
-    const [limit, setLimit] = useState(10);
     const [totalPages, setTotalPages] = useState(1);
     const [total, setTotal] = useState(0);
+    const page = toPositiveInt(searchParams.get('page'), DEFAULT_PAGE);
+    const limit = toPositiveInt(searchParams.get('limit'), DEFAULT_LIMIT);
+
+    const updateQuery = useCallback(
+        (nextPage: number, nextLimit: number) => {
+            setSearchParams((prev) => {
+                const next = new URLSearchParams(prev);
+                next.set('employeePage', String(nextPage));
+                next.set('employeeLimit', String(nextLimit));
+                return next;
+            });
+        },
+        [setSearchParams]
+    );
+
+    useEffect(() => {
+        const currentPage = searchParams.get('page');
+        const currentLimit = searchParams.get('limit');
+        const normalizedPage = String(page);
+        const normalizedLimit = String(limit);
+
+        if (currentPage !== normalizedPage || currentLimit !== normalizedLimit) {
+            updateQuery(page, limit);
+        }
+    }, [limit, page, searchParams, updateQuery]);
 
     useSocket((payload: any) => {
         dispatch(
@@ -128,10 +162,9 @@ export default function EmployeesTab() {
                         totalPages={totalPages}
                         totalItems={total}
                         limit={limit}
-                        onPageChange={setPage}
+                        onPageChange={(newPage) => updateQuery(newPage, limit)}
                         onLimitChange={(newLimit) => {
-                            setPage(1);
-                            setLimit(newLimit);
+                            updateQuery(1, newLimit);
                         }}
                     />
                 </div>

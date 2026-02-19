@@ -14,17 +14,33 @@ import {
   ForbiddenException,
   Logger
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AdminGuard } from '../auth/guards/admin.guard';
 import { EmployeeService } from './employee.service';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
+import { DEFAULT_LIMIT, DEFAULT_MAX_LIMIT, DEFAULT_PAGE } from 'src/common/constant';
 
 @Controller('employees')
 export class EmployeeController {
   private readonly logger = new Logger(EmployeeController.name);
-  constructor(private readonly employeeService: EmployeeService) {}
+  private readonly maxEmployeeListLimit: number;
+
+  constructor(
+    private readonly employeeService: EmployeeService,
+    private readonly configService: ConfigService,
+  ) {
+    const configuredMaxLimit = Number.parseInt(
+      this.configService.get<string>('EMPLOYEE_LIST_MAX_LIMIT') ?? `${DEFAULT_MAX_LIMIT}`,
+      10,
+    );
+    this.maxEmployeeListLimit =
+      Number.isInteger(configuredMaxLimit) && configuredMaxLimit > 0
+        ? configuredMaxLimit
+        : DEFAULT_MAX_LIMIT;
+  }
 
   @Post()
   @UseGuards(JwtAuthGuard, AdminGuard)
@@ -35,11 +51,21 @@ export class EmployeeController {
   @Get()
   @UseGuards(JwtAuthGuard, AdminGuard)
   findAll(@Query('page') page?: string, @Query('limit') limit?: string) {
-    this.logger.log(`Fetching employees - Page: ${page || 1}, Limit: ${limit || 10}`);
-    return this.employeeService.findAll(
-      page ? parseInt(page, 10) : 1,
-      limit ? parseInt(limit, 10) : 10,
+    const parsedPage = Number.parseInt(page ?? `${DEFAULT_PAGE}`, 10);
+    const parsedLimit = Number.parseInt(limit ?? `${DEFAULT_LIMIT}`, 10);
+
+    const safePage =
+      Number.isInteger(parsedPage) && parsedPage > 0 ? parsedPage : DEFAULT_PAGE;
+    const safeLimit =
+      Number.isInteger(parsedLimit) && parsedLimit > 0
+        ? Math.min(parsedLimit, this.maxEmployeeListLimit)
+        : DEFAULT_LIMIT;
+
+    this.logger.log(
+      `Fetching employees - Page: ${safePage}, Limit: ${safeLimit}, MaxLimit: ${this.maxEmployeeListLimit}`,
     );
+
+    return this.employeeService.findAll(safePage, safeLimit);
   }
 
   @Get('me')
